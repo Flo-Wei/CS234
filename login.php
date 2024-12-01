@@ -16,7 +16,7 @@
                 try {
                     require_once "includes/dbh.inc.php";
 
-                    $query = "SELECT username, password_hash FROM users WHERE username=:username;";
+                    $query = "SELECT (Username, PasswordHash) FROM users WHERE username=:username;";
                     $stmt = $pdo->prepare(query: $query);
                     $stmt->bindParam(param: ":username", var: $username);
 
@@ -28,7 +28,7 @@
                     } else {
                         $result = $results[0];
                         // See if submitted password matches the hash stored in the Users table  
-                        if (password_verify(password: $password, hash: $result["password_hash"])) {
+                        if (password_verify(password: $password, hash: $result["PasswordHash"])) {
                             $_SESSION["username"] = $username;
                             header(header: "Location: index.php");
                             die;

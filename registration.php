@@ -14,7 +14,7 @@
                 try {
                     require_once "includes/dbh.inc.php";
 
-                    $query = "INSERT INTO users (username, password_hash) VALUES (:username, :password_hash);";
+                    $query = "INSERT INTO users (Username, PasswordHash) VALUES (:username, :password_hash);";
                     $stmt = $pdo->prepare(query: $query);
                     $stmt->bindParam(param: ":username", var: $username);
                     $stmt->bindParam(param: ":password_hash", var: $passwordHash);
