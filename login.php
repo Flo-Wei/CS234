@@ -16,7 +16,7 @@
                 try {
                     require_once "includes/dbh.inc.php";
 
-                    $query = "SELECT (Username, PasswordHash) FROM users WHERE username=:username;";
+                    $query = "SELECT UserID, Username, PasswordHash, Role FROM users WHERE Username=:username;";
                     $stmt = $pdo->prepare(query: $query);
                     $stmt->bindParam(param: ":username", var: $username);
 
@@ -24,12 +24,14 @@
                     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                     if (count(value: $results) !== 1) {
-                        die("Unexpected number of results returned. Found: " . count(value: $results));
+                        echo"<p>Incorrect username or password.</p>";
                     } else {
                         $result = $results[0];
                         // See if submitted password matches the hash stored in the Users table  
                         if (password_verify(password: $password, hash: $result["PasswordHash"])) {
-                            $_SESSION["username"] = $username;
+                            $_SESSION["UserID"] = $result["UserID"];
+                            $_SESSION["Username"] = $result["Username"];
+                            $_SESSION["Role"] = $result["Role"];
                             header(header: "Location: index.php");
                             die;
                         } 
@@ -40,12 +42,12 @@
 
                     $pdo = null;
                     $stmt = null;
-                    die;
 
                 } catch (PDOException $e) {
                     if ($e->getCode() == 23000) {
                         echo "<p>Username already exists. Please choose a different username.</p>";
                     } else {
+                        echo "$query";
                         die("Query failed: " . $e->getMessage());
                     }
                 }

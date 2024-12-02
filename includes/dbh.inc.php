@@ -1,4 +1,4 @@
-<?php
+<?php //dbh.inc.php
 
 // Database connection settings
 $host = 'localhost:8889'; // Database host
