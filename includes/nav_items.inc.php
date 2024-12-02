@@ -6,7 +6,7 @@
     $navItems = [
         "Home" => ["url" => "index.php", "roles" => ["admin", "user"]],
         "Library" => ["url" => "library.php", "roles" => ["admin", "user"]],
-        "Favourite Books" => ["url" => "favourites.php", "roles" => ["admin", "user"]],
+        "Favourite Books" => ["url" => "library_favourites.php", "roles" => ["admin", "user"]],
         "Add Book" => ["url" => "admin_add_book.php", "roles" => ["admin"]],
         "Admin Panel" => ["url" => "admin_panel.php", "roles" => ["admin"]],
         "Logout" => ["url" => "logout.php", "roles" => ["admin", "user"]],
