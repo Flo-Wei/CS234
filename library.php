@@ -1,14 +1,38 @@
 <?php
-require_once 'includes/session_handler.inc.php'; // Session handling
-require_once 'includes/dbh.inc.php'; // Database connection
+require_once 'includes/session_handler.inc.php'; 
+require_once 'includes/dbh.inc.php'; 
 
 // Handle delete request (only for admin)
 if ($_SESSION['Role'] === 'admin' && isset($_POST['delete_book_id'])) {
     $book_id = intval($_POST['delete_book_id']);
     $stmt = $pdo->prepare('DELETE FROM books WHERE BookID = :book_id');
     $stmt->execute(['book_id' => $book_id]);
-    header('Location: library.php'); // Redirect to refresh the page
+    header('Location: library.php'); 
     exit;
+}
+
+// Handle favourite book request
+if (isset($_POST['favourite_book_id'])) {
+    $user_id = $_SESSION['UserID'];
+    $book_id = intval($_POST['favourite_book_id']);
+
+    // Check if the book is already in the user's favourites
+    $stmt = $pdo->prepare('SELECT * FROM favorites WHERE UserID = :user_id AND BookID = :book_id');
+    $stmt->execute(['user_id' => $user_id, 'book_id' => $book_id]);
+    $favourite = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($favourite) {
+        // Remove from favourites
+        $stmt = $pdo->prepare('DELETE FROM favorites WHERE UserID = :user_id AND BookID = :book_id');
+        $stmt->execute(['user_id' => $user_id, 'book_id' => $book_id]);
+    } else {
+        // Add to favourites
+        $stmt = $pdo->prepare('INSERT INTO favorites (UserID, BookID) VALUES (:user_id, :book_id)');
+        $stmt->execute(['user_id' => $user_id, 'book_id' => $book_id]);
+    }
+
+    header('Location: library.php');
+    die;
 }
 
 // Search functionality
@@ -50,6 +74,15 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
             justify-content: space-between;
             align-items: center;
         }
+        .favorite-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        .favorite-button img {
+            width: 20px;
+            height: 20px;
+        }
     </style>
 </head>
 <body>
@@ -70,6 +103,13 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         <?php if (count($books) > 0): ?>
             <?php foreach ($books as $book): ?>
+                <?php
+                // Check if the book is already in the user's favourites
+                $user_id = $_SESSION['UserID'];
+                $stmt = $pdo->prepare('SELECT * FROM favorites WHERE UserID = :user_id AND BookID = :book_id');
+                $stmt->execute(['user_id' => $user_id, 'book_id' => $book['BookID']]);
+                $is_favourite = $stmt->fetch(PDO::FETCH_ASSOC);
+                ?>
                 <!-- Book Card -->
                 <div class="w3-card w3-padding w3-margin-bottom book-card">
                     <div class="w3-row">
@@ -86,15 +126,25 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                         <!-- Content -->
                         <div class="w3-col s9 book-content">
-                            <!-- Title and Delete Button -->
+                            <!-- Title and Favorite/Delete Buttons -->
                             <div class="book-title-container">
                                 <div class="w3-large w3-bold"><?= htmlspecialchars($book['Title']) ?></div>
-                                <?php if ($_SESSION['Role'] === 'admin'): ?>
+                                <div>
+                                    <!-- Delete Button (Admins only) -->
+                                    <?php if ($_SESSION['Role'] === 'admin'): ?>
+                                        <form method="post" action="library.php" style="display: inline;">
+                                            <input type="hidden" name="delete_book_id" value="<?= $book['BookID'] ?>">
+                                            <button class="w3-button w3-red" type="submit" onclick="return confirm('Are you sure you want to delete this book?');">Delete</button>
+                                        </form>
+                                    <?php endif; ?>
+                                    <!-- Favorite Button -->
                                     <form method="post" action="library.php" style="display: inline;">
-                                        <input type="hidden" name="delete_book_id" value="<?= $book['BookID'] ?>">
-                                        <button class="w3-button w3-red" type="submit" onclick="return confirm('Are you sure you want to delete this book?');">Delete</button>
+                                        <input type="hidden" name="favourite_book_id" value="<?= $book['BookID'] ?>">
+                                        <button class="favorite-button" type="submit">
+                                            <img src="<?= $is_favourite ? 'other/full_star_icon.png' : 'other/empty_star_icon.png' ?>" alt="Favorite">
+                                        </button>
                                     </form>
-                                <?php endif; ?>
+                                </div>
                             </div>
                             
                             <!-- Description -->
@@ -103,22 +153,18 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <!-- Metadata -->
                             <div class="w3-small w3-text-grey w3-margin-top">
                                 <?php
-                                // Fetch author name
+                                // Fetch author and publisher names
                                 $author_name = 'Unknown';
                                 if ($book['AuthorID']) {
                                     $stmt = $pdo->prepare('SELECT Name FROM authors WHERE AuthorID = :author_id');
-                                    $stmt->bindParam(":author_id", $book['AuthorID']);
-                                    $stmt->execute();
+                                    $stmt->execute(['author_id' => $book['AuthorID']]);
                                     $author = $stmt->fetch(PDO::FETCH_ASSOC);
                                     $author_name = $author ? $author['Name'] : 'Unknown';
                                 }
-                                
-                                // Fetch publisher name
                                 $publisher_name = 'Unknown';
                                 if ($book['PublisherID']) {
                                     $stmt = $pdo->prepare('SELECT Name FROM publishers WHERE PublisherID = :publisher_id');
-                                    $stmt->bindParam(":publisher_id", $book['PublisherID']);
-                                    $stmt->execute();
+                                    $stmt->execute(['publisher_id' => $book['PublisherID']]);
                                     $publisher = $stmt->fetch(PDO::FETCH_ASSOC);
                                     $publisher_name = $publisher ? $publisher['Name'] : 'Unknown';
                                 }
@@ -138,4 +184,3 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 </body>
 </html>
-
