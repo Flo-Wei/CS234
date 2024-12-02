@@ -1,23 +1,20 @@
+<?php require_once "includes/session_handler.inc.php"; ?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
-        <title>Library</title>
+        <meta charset="UTF-8">
+        <title>Project Bookshelf - Homepage</title>
+        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     </head>
     <body>
-        <?php
-            session_start();
-            if (!isset($_SESSION["username"])) {
-                // var_dump($_SESSION);
-                header(header: "Location: login.php");
-                die;
-             }
-        ?>
+        <div class="w3-bar w3-dark-grey">
+            <?php include_once "includes/nav_items.inc.php"; ?>
+        </div>
 
-        <h1>Library:</h1>
-        <ul>
-            <li>Book 1</li>
-            <li>Book 2</li>
-            <li>Book 3</li>
-        </ul>
+        <!-- Main content of the page -->
+        <div>
+            <h1>Welcome to the Homepage</h1>
+            <p>Your role is: <strong><?php echo htmlspecialchars($role); ?></strong></p>
+        </div>
     </body>
 </html>
