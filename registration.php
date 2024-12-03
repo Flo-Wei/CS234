@@ -88,7 +88,7 @@
 
                         $passwordHash = password_hash($password, PASSWORD_BCRYPT);
 
-                        $query = "INSERT INTO users (Username, PasswordHash) VALUES (:username, :password_hash);";
+                        $query = "INSERT INTO registration (Username, PasswordHash) VALUES (:username, :password_hash);";
                         $stmt = $pdo->prepare($query);
                         $stmt->bindParam(":username", $username);
                         $stmt->bindParam(":password_hash", $passwordHash);

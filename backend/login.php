@@ -10,7 +10,7 @@
         try {
             require_once "../includes/dbh.inc.php";
 
-            $query = "SELECT UserID, Username, PasswordHash, Role FROM users WHERE Username=:username;";
+            $query = "SELECT UserID, Username, PasswordHash, Role FROM registration WHERE Username=:username;";
             $stmt = $pdo->prepare(query: $query);
             $stmt->bindParam(param: ":username", var: $username);
 
@@ -22,7 +22,7 @@
                 // echo"<p>Incorrect username or password.</p>";
             } else {
                 $result = $results[0];
-                // See if submitted password matches the hash stored in the Users table  
+                // See if submitted password matches the hash stored in the Registrations table  
                 if (password_verify(password: $password, hash: $result["PasswordHash"])) {
                     $_SESSION["UserID"] = $result["UserID"];
                     $_SESSION["Username"] = $result["Username"];

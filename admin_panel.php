@@ -18,20 +18,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         if (isset($_POST['change_role'])) {
             $new_role = $_POST['new_role'];
-            $stmt = $pdo->prepare('UPDATE users SET Role = :new_role WHERE UserID = :user_id');
+            $stmt = $pdo->prepare('UPDATE registration SET Role = :new_role WHERE UserID = :user_id');
             $stmt->execute(['new_role' => $new_role, 'user_id' => $user_id]);
             $message = "User role updated successfully.";
         }
 
         if (isset($_POST['reset_password'])) {
             $new_password = password_hash($_POST['new_password'], PASSWORD_BCRYPT);
-            $stmt = $pdo->prepare('UPDATE users SET PasswordHash = :new_password WHERE UserID = :user_id');
+            $stmt = $pdo->prepare('UPDATE registration SET PasswordHash = :new_password WHERE UserID = :user_id');
             $stmt->execute(['new_password' => $new_password, 'user_id' => $user_id]);
             $message = "User password reset successfully.";
         }
 
         if (isset($_POST['delete_user'])) {
-            $stmt = $pdo->prepare('DELETE FROM users WHERE UserID = :user_id');
+            $stmt = $pdo->prepare('DELETE FROM registration WHERE UserID = :user_id');
             $stmt->execute(['user_id' => $user_id]);
             $message = "User deleted successfully.";
         }
@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Fetch all users
-$stmt = $pdo->query('SELECT * FROM users ORDER BY UserID ASC');
+$stmt = $pdo->query('SELECT * FROM registration ORDER BY UserID ASC');
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
