@@ -3,8 +3,8 @@ require_once "includes/session_handler.inc.php";
 require_once 'includes/dbh.inc.php'; 
 
 if (!isset($_GET['book_id'])) {
-    // header("Location: library_all.php");
-    // exit;
+    header("Location: library_all.php");
+    exit;
 } else {
     $BookID = intval($_GET['book_id']); // Get BookID from URL safely
 
@@ -23,8 +23,8 @@ if (!isset($_GET['book_id'])) {
 
     if (!$book) {
         // Redirect if book not found
-        // header("Location: library_all.php");
-        // exit;
+        header("Location: library_all.php");
+        exit;
     }
 }
 ?>
@@ -87,10 +87,14 @@ if (!isset($_GET['book_id'])) {
             </div>
         </div>
 
-        <!-- Back Button -->
-        <div class="w3-center">
-            <a href="library_all.php" class="w3-button w3-blue w3-margin-top">Back to Library</a>
+        <!-- Buttons -->
+        <div class="w3-bar w3-margin-top">
+            <a href="library_all.php" class="w3-bar-item w3-button w3-blue w3-right ">Back to Library</a>
+            <a href="admin_edit_book.php?book_id=<?= $BookID?>" class="w3-bar-item w3-button w3-yellow w3-right w3-margin-right">Edit Book</a>
         </div>
+
+
+
     </div>
 </body>
 </html>

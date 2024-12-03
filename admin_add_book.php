@@ -1,4 +1,11 @@
-<?php require_once "includes/session_handler.inc.php"; ?>
+<?php 
+    require_once "includes/session_handler.inc.php"; 
+    // Check if user is admin
+    if ($_SESSION['Role'] != 'admin') {
+        header('Location: index.php');
+        exit;
+    }
+?>
 <!DOCTYPE html>
 <html>
     <head>
