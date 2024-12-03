@@ -2,7 +2,6 @@
 require_once 'includes/session_handler.inc.php'; 
 require_once 'includes/dbh.inc.php'; 
 
-
 // Search functionality
 $search_query = $_GET['search'] ?? '';
 $user_id = $_SESSION['UserID'];
@@ -36,13 +35,20 @@ if ($search_query) {
 $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
-
 <!DOCTYPE html>
 <html>
 <head>
     <title>Library - Favourite Books</title>
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <style>
+        body {
+            font-family: "Arial", sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+        }
+        .content {
+            padding: 20px;
+        }
         .book-card {
             margin-bottom: 20px;
         }
@@ -73,33 +79,30 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
             width: 20px;
             height: 20px;
         }
+        .w3-button {
+            min-width: 80px;
+        }
     </style>
 </head>
 <body>
     <!-- Navigation -->
-    <div class="w3-bar w3-dark-grey">
+    <div class="w3-bar w3-teal">
         <?php include_once "includes/nav_items.inc.php"; ?>
     </div>
 
-    <div class="w3-container">
-        <h2>Library - Favourite Books</h2>
+    <!-- Main Content -->
+    <div class="content">
+        <h2 class="w3-text-teal">Library - Favourite Books</h2>
 
         <!-- Search Field -->
         <form method="get" action="library_favourites.php" class="w3-margin-bottom">
             <label for="search" class="w3-text-black"><b>Search by Title</b></label>
             <input class="w3-input w3-border" type="text" name="search" id="search" value="<?= htmlspecialchars($search_query) ?>" placeholder="Enter book title">
-            <button class="w3-button w3-blue w3-margin-top" type="submit">Search</button>
+            <button class="w3-button w3-teal w3-margin-top" type="submit">Search</button>
         </form>
 
         <?php if (count($books) > 0): ?>
             <?php foreach ($books as $book): ?>
-                <?php
-                // Check if the book is already in the user's favourites
-                $user_id = $_SESSION['UserID'];
-                $stmt = $pdo->prepare('SELECT * FROM favorites WHERE UserID = :user_id AND BookID = :book_id');
-                $stmt->execute(['user_id' => $user_id, 'book_id' => $book['BookID']]);
-                $is_favourite = $stmt->fetch(PDO::FETCH_ASSOC);
-                ?>
                 <!-- Book Card -->
                 <div class="w3-card w3-padding w3-margin-bottom book-card">
                     <div class="w3-row">
@@ -118,7 +121,7 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <div class="w3-col s9 book-content">
                             <!-- Title and Favorite/Delete Buttons -->
                             <div class="book-title-container">
-                            <div class="w3-large w3-bold"><a href="view_book.php?book_id=<?= $book['BookID'];?>"><?= htmlspecialchars($book['Title']) ?></a></div>
+                                <div class="w3-large w3-bold"><a href="view_book.php?book_id=<?= $book['BookID'];?>"><?= htmlspecialchars($book['Title']) ?></a></div>
                                 <div>
                                     <!-- Delete Button (Admins only) -->
                                     <?php if ($_SESSION['Role'] === 'admin'): ?>

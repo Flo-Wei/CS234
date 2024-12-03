@@ -17,14 +17,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $message = "You cannot change or delete your own account.";
     } else {
         if (isset($_POST['change_role'])) {
-            $new_role = $_POST['new_role']; // Get the selected role from the dropdown
+            $new_role = $_POST['new_role'];
             $stmt = $pdo->prepare('UPDATE users SET Role = :new_role WHERE UserID = :user_id');
             $stmt->execute(['new_role' => $new_role, 'user_id' => $user_id]);
             $message = "User role updated successfully.";
         }
 
         if (isset($_POST['reset_password'])) {
-            $new_password = password_hash($_POST['new_password'], PASSWORD_BCRYPT); // Get new password
+            $new_password = password_hash($_POST['new_password'], PASSWORD_BCRYPT);
             $stmt = $pdo->prepare('UPDATE users SET PasswordHash = :new_password WHERE UserID = :user_id');
             $stmt->execute(['new_password' => $new_password, 'user_id' => $user_id]);
             $message = "User password reset successfully.";
@@ -41,7 +41,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Fetch all users
 $stmt = $pdo->query('SELECT * FROM users ORDER BY UserID ASC');
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
 ?>
 <!DOCTYPE html>
 <html>
@@ -49,28 +48,40 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <title>Admin Panel - Manage Users</title>
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <style>
-        table td:last-child {
-            text-align: center;
+        body {
+            font-family: "Arial", sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+        }
+        .content {
+            padding: 20px;
+        }
+        table {
+            margin-top: 20px;
         }
         .password-container {
             display: flex;
             gap: 10px;
             align-items: center;
         }
+        .w3-button {
+            min-width: 80px;
+        }
     </style>
 </head>
 <body>
     <!-- Navigation -->
-    <div class="w3-bar w3-dark-grey">
+    <div class="w3-bar w3-teal">
         <?php include_once "includes/nav_items.inc.php"; ?>
     </div>
 
-    <div class="w3-container">
-        <h2>Admin Panel - Manage Users</h2>
+    <!-- Main Content -->
+    <div class="content">
+        <h2 class="w3-text-teal">Admin Panel - Manage Users</h2>
 
         <!-- Message -->
         <?php if (isset($message)): ?>
-            <div class="w3-panel w3-green w3-margin-bottom">
+            <div class="w3-panel w3-pale-green w3-border w3-round w3-margin-bottom">
                 <?= htmlspecialchars($message) ?>
             </div>
         <?php endif; ?>
