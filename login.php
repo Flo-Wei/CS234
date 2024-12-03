@@ -10,7 +10,7 @@
         }
         .login-container {
             max-width: 400px;
-            margin: 50px auto;
+            margin: 20px auto;
             padding: 20px;
             background-color: #fff;
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
@@ -23,10 +23,23 @@
             text-align: center;
             margin-top: 15px;
         }
+        .banner-container img {
+            max-width: 600px; 
+            height: auto;
+            margin: 0 auto;
+            display: block;
+            border-radius: 8px;
+        }
     </style>
 </head>
 <body>
     <div class="w3-container">
+        <!-- Banner -->
+        <div class="banner-container w3-center w3-margin-top">
+            <img src="other/Banner.jpeg" alt="Banner" class="w3-image">
+        </div>
+
+        <!-- Login Form -->
         <div class="login-container w3-card">
             <h2 class="w3-center w3-text-teal">Login</h2>
             
@@ -37,7 +50,6 @@
                 </div>
             <?php endif; ?>
 
-            <!-- Login Form -->
             <form method="post" action="backend/login.php">
                 <div class="w3-margin-bottom">
                     <label for="username" class="w3-text-black"><b>Username</b></label>
