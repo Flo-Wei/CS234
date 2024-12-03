@@ -1,100 +1,4 @@
-<?php
-    require_once 'includes/session_handler.inc.php';
-    // Check if user is admin
-    if ($_SESSION['Role'] != 'admin') {
-        header('Location: index.php');
-        exit;
-    }
-
-    // Include database connection
-    require_once 'includes/dbh.inc.php';
-
-
-    $errors = [];
-    $success = false;
-
-    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-        $title = $_POST['title'] ?? '';
-        $author_name = $_POST['author_name'] ?? '';
-        $publisher_name = $_POST['publisher_name'] ?? '';
-        $publication_date = $_POST['publication_date'] ?? '';
-        $isbn = $_POST['isbn'] ?? '';
-        $genre = $_POST['genre'] ?? '';
-        $description = $_POST['description'] ?? '';
-        $cover_image_url = $_POST['cover_image_url'] ?? '';
-
-        // Validate title field
-        if (empty($title)) {
-            $errors[] = 'Title is required.';
-        }
-
-        // Validate and get AuthorID
-        if (!empty($author_name)) {
-            // Check if author exists
-            $stmt = $pdo->prepare(query: 'SELECT AuthorID FROM authors WHERE Name = :AuthorName');
-            $stmt->bindParam(param: ":AuthorName", var: $author_name);
-            $author = $stmt->fetch(mode: PDO::FETCH_ASSOC);
-            if ($author) {
-                $author_id = $author['AuthorID'];
-            } else {
-                // Insert new author
-                $stmt = $pdo->prepare(query: 'INSERT INTO authors (Name) VALUES (:AuthorName)');
-                $stmt->bindParam(param: ":AuthorName", var: $author_name);
-                $stmt->execute();
-                $author_id = $pdo->lastInsertId();
-            }
-        } else {
-            $author_id = null;
-        }
-
-        // Validate and get PublisherID
-        if (!empty($publisher_name)) {
-            // Check if publisher exists
-            $stmt = $pdo->prepare(query: 'SELECT PublisherID FROM publishers WHERE Name = :PublishersName');
-            $stmt->bindParam(param: ":PublishersName", var: $publisher_name);
-            $stmt->execute();
-            $publisher = $stmt->fetch(mode: PDO::FETCH_ASSOC);
-            if ($publisher) {
-                $publisher_id = $publisher['PublisherID'];
-            } else {
-                // Insert new publisher
-                $stmt = $pdo->prepare(query: 'INSERT INTO publishers (Name) VALUES (:PublishersName)');
-                $stmt->bindParam(param: ":PublishersName", var: $publisher_name);
-                $stmt->execute();
-                $publisher_id = $pdo->lastInsertId();
-            }
-        } else {
-            $publisher_id = null;
-        }
-
-        // Insert book if no errors
-        if (empty($errors)) {
-            try {
-                $stmt = $pdo->prepare(query: 'INSERT INTO books (Title, AuthorID, PublisherID, PublicationDate, ISBN, Genre, Description, CoverImageURL) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
-                $stmt->execute(params: [
-                    $title,
-                    $author_id,
-                    $publisher_id,
-                    $publication_date ?: null,
-                    $isbn ?: null,
-                    $genre ?: null,
-                    $description ?: null,
-                    $cover_image_url ?: null
-                ]);
-                $book_id = $pdo->lastInsertId();
-                $success = true;
-            } catch (PDOException $e) {
-                if ($e->getCode() == 23000) { // Integrity constraint violation
-                    $errors[] = 'A book with this ISBN already exists.';
-                } else {
-                    $errors[] = 'Database error: ' . $e->getMessage();
-                }
-            }
-        }
-    }
-
-    
-?>
+<?php require_once "includes/session_handler.inc.php"; ?>
 <!DOCTYPE html>
 <html>
     <head>
@@ -110,21 +14,15 @@
         <h2>Add New Book</h2>
 
         <?php 
-            if ($success) {
-                header(header: "Location: view_book.php?book_id=$book_id");
-                die;
-            }
-
-            if (!empty($errors)) {
+            if (isset($_GET["error"])) {
+                $errors = $_GET["error"];
                 echo '<div class="w3-panel w3-red"><ul>';
-                foreach ($errors as $error) {
-                    echo '<li>' . htmlspecialchars(string: $error) . '</li>';
-                }
+                echo $errors;
                 echo '</ul></div>';
             }
         ?>
 
-        <form class="w3-container" method="post" action="">
+        <form class="w3-container" method="post" action="backend/add_book.php">
 
             <label class="w3-text-black"><b>Title*</b></label>
             <input class="w3-input w3-border" type="text" name="title" value="<?= htmlspecialchars(string: $title ?? '') ?>" required>

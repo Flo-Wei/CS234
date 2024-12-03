@@ -5,11 +5,11 @@
     // Define navigation items with associated roles
     $navItems = [
         "Home" => ["url" => "index.php", "roles" => ["admin", "user"]],
-        "Library" => ["url" => "library.php", "roles" => ["admin", "user"]],
+        "Library" => ["url" => "library_all.php", "roles" => ["admin", "user"]],
         "Favourite Books" => ["url" => "library_favourites.php", "roles" => ["admin", "user"]],
         "Add Book" => ["url" => "admin_add_book.php", "roles" => ["admin"]],
         "Admin Panel" => ["url" => "admin_panel.php", "roles" => ["admin"]],
-        "Logout" => ["url" => "logout.php", "roles" => ["admin", "user"]],
+        "Logout" => ["url" => "backend/logout.php", "roles" => ["admin", "user"]],
     ];
 
     // Generate navigation links based on the user's role

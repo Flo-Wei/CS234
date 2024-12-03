@@ -3,30 +3,6 @@ require_once 'includes/session_handler.inc.php';
 require_once 'includes/dbh.inc.php'; 
 
 
-// Handle favourite book request
-if (isset($_POST['favourite_book_id'])) {
-    $user_id = $_SESSION['UserID'];
-    $book_id = intval($_POST['favourite_book_id']);
-
-    // Check if the book is already in the user's favourites
-    $stmt = $pdo->prepare('SELECT * FROM favorites WHERE UserID = :user_id AND BookID = :book_id');
-    $stmt->execute(['user_id' => $user_id, 'book_id' => $book_id]);
-    $favourite = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if ($favourite) {
-        // Remove from favourites
-        $stmt = $pdo->prepare('DELETE FROM favorites WHERE UserID = :user_id AND BookID = :book_id');
-        $stmt->execute(['user_id' => $user_id, 'book_id' => $book_id]);
-    } else {
-        // Add to favourites
-        $stmt = $pdo->prepare('INSERT INTO favorites (UserID, BookID) VALUES (:user_id, :book_id)');
-        $stmt->execute(['user_id' => $user_id, 'book_id' => $book_id]);
-    }
-
-    header('Location: library_favourites.php');
-    die;
-}
-
 // Search functionality
 $search_query = $_GET['search'] ?? '';
 $user_id = $_SESSION['UserID'];
@@ -146,14 +122,16 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <div>
                                     <!-- Delete Button (Admins only) -->
                                     <?php if ($_SESSION['Role'] === 'admin'): ?>
-                                        <form method="post" action="library_favourites.php" style="display: inline;">
+                                        <form method="post" action="backend/delete_book.php" style="display: inline;">
                                             <input type="hidden" name="delete_book_id" value="<?= $book['BookID'] ?>">
+                                            <input type="hidden" name="referrer" value="library_favourites.php">
                                             <button class="w3-button w3-red" type="submit" onclick="return confirm('Are you sure you want to delete this book?');">Delete</button>
                                         </form>
                                     <?php endif; ?>
                                     <!-- Favorite Button -->
-                                    <form method="post" action="library_favourites.php" style="display: inline;">
+                                    <form method="post" action="backend/handle_favourites.php" style="display: inline;">
                                         <input type="hidden" name="favourite_book_id" value="<?= $book['BookID'] ?>">
+                                        <input type="hidden" name="referrer" value="library_favourites.php">
                                         <button class="favorite-button" type="submit">
                                             <img src="<?= $is_favourite ? 'other/full_star_icon.png' : 'other/empty_star_icon.png' ?>" alt="Favorite">
                                         </button>

@@ -47,5 +47,8 @@
             </p>
             <input type="submit" value="Create Account">
         </form>
+        <p>
+            <a href="login.php">I already have an Account</a>
+        </p>
     </body>
 </html>

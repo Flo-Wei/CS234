@@ -2,38 +2,6 @@
 require_once 'includes/session_handler.inc.php'; 
 require_once 'includes/dbh.inc.php'; 
 
-// Handle delete request (only for admin)
-if ($_SESSION['Role'] === 'admin' && isset($_POST['delete_book_id'])) {
-    $book_id = intval($_POST['delete_book_id']);
-    $stmt = $pdo->prepare('DELETE FROM books WHERE BookID = :book_id');
-    $stmt->execute(['book_id' => $book_id]);
-    header('Location: library.php'); 
-    exit;
-}
-
-// Handle favourite book request
-if (isset($_POST['favourite_book_id'])) {
-    $user_id = $_SESSION['UserID'];
-    $book_id = intval($_POST['favourite_book_id']);
-
-    // Check if the book is already in the user's favourites
-    $stmt = $pdo->prepare('SELECT * FROM favorites WHERE UserID = :user_id AND BookID = :book_id');
-    $stmt->execute(['user_id' => $user_id, 'book_id' => $book_id]);
-    $favourite = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if ($favourite) {
-        // Remove from favourites
-        $stmt = $pdo->prepare('DELETE FROM favorites WHERE UserID = :user_id AND BookID = :book_id');
-        $stmt->execute(['user_id' => $user_id, 'book_id' => $book_id]);
-    } else {
-        // Add to favourites
-        $stmt = $pdo->prepare('INSERT INTO favorites (UserID, BookID) VALUES (:user_id, :book_id)');
-        $stmt->execute(['user_id' => $user_id, 'book_id' => $book_id]);
-    }
-
-    header('Location: library.php');
-    die;
-}
 
 // Search functionality
 $search_query = $_GET['search'] ?? '';
@@ -95,7 +63,7 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <h2>Library - All Books</h2>
 
         <!-- Search Field -->
-        <form method="get" action="library.php" class="w3-margin-bottom">
+        <form method="get" action="library_all.php" class="w3-margin-bottom">
             <label for="search" class="w3-text-black"><b>Search by Title</b></label>
             <input class="w3-input w3-border" type="text" name="search" id="search" value="<?= htmlspecialchars($search_query) ?>" placeholder="Enter book title">
             <button class="w3-button w3-blue w3-margin-top" type="submit">Search</button>
@@ -132,14 +100,16 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <div>
                                     <!-- Delete Button (Admins only) -->
                                     <?php if ($_SESSION['Role'] === 'admin'): ?>
-                                        <form method="post" action="library.php" style="display: inline;">
+                                        <form method="post" action="backend/delete_book.php" style="display: inline;">
                                             <input type="hidden" name="delete_book_id" value="<?= $book['BookID'] ?>">
+                                            <input type="hidden" name="referrer" value="library_all.php">
                                             <button class="w3-button w3-red" type="submit" onclick="return confirm('Are you sure you want to delete this book?');">Delete</button>
                                         </form>
                                     <?php endif; ?>
                                     <!-- Favorite Button -->
-                                    <form method="post" action="library.php" style="display: inline;">
+                                    <form method="post" action="backend/handle_favourites.php" style="display: inline;">
                                         <input type="hidden" name="favourite_book_id" value="<?= $book['BookID'] ?>">
+                                        <input type="hidden" name="referrer" value="library_all.php">
                                         <button class="favorite-button" type="submit">
                                             <img src="<?= $is_favourite ? 'other/full_star_icon.png' : 'other/empty_star_icon.png' ?>" alt="Favorite">
                                         </button>
