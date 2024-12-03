@@ -84,11 +84,11 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <!-- Image -->
                         <div class="w3-col s3 w3-center">
                             <div class="book-image">
-                                <?php if ($book['CoverImageURL']): ?>
-                                    <img src="<?= htmlspecialchars($book['CoverImageURL']) ?>" alt="Cover Image" style="max-width: 100%; max-height: 100%;">
-                                <?php else: ?>
-                                    <img src="https://t4.ftcdn.net/jpg/07/70/68/85/360_F_770688532_1lSpeaYY1xSDWncJ8g9etCBsCdzIUV2u.jpg" alt="Standard Image" style="max-width: 100%; max-height: 100%;">
-                                <?php endif; ?>
+                                    <?php if ($book['CoverImageURL']): ?>
+                                        <img src="<?= htmlspecialchars($book['CoverImageURL']) ?>" alt="Cover Image" style="max-width: 100%; max-height: 100%;">
+                                    <?php else: ?>
+                                        <img src="https://t4.ftcdn.net/jpg/07/70/68/85/360_F_770688532_1lSpeaYY1xSDWncJ8g9etCBsCdzIUV2u.jpg" alt="Standard Image" style="max-width: 100%; max-height: 100%;">
+                                    <?php endif; ?>
                             </div>
                         </div>
 
@@ -96,7 +96,7 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <div class="w3-col s9 book-content">
                             <!-- Title and Favorite/Delete Buttons -->
                             <div class="book-title-container">
-                                <div class="w3-large w3-bold"><?= htmlspecialchars($book['Title']) ?></div>
+                                <div class="w3-large w3-bold"><a href="view_book.php?book_id=<?= $book['BookID'];?>"><?= htmlspecialchars($book['Title']) ?></a></div>
                                 <div>
                                     <!-- Delete Button (Admins only) -->
                                     <?php if ($_SESSION['Role'] === 'admin'): ?>

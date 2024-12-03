@@ -118,7 +118,7 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <div class="w3-col s9 book-content">
                             <!-- Title and Favorite/Delete Buttons -->
                             <div class="book-title-container">
-                                <div class="w3-large w3-bold"><?= htmlspecialchars($book['Title']) ?></div>
+                            <div class="w3-large w3-bold"><a href="view_book.php?book_id=<?= $book['BookID'];?>"><?= htmlspecialchars($book['Title']) ?></a></div>
                                 <div>
                                     <!-- Delete Button (Admins only) -->
                                     <?php if ($_SESSION['Role'] === 'admin'): ?>
